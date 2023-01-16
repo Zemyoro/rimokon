@@ -19,7 +19,6 @@ async function main(): Promise<any> {
         device.name = deviceInfo.friendlyDeviceName;
         device.vendor = deviceInfo.vendorName;
         device.model = deviceInfo.modelName;
-        device.applications = await device.apps();
         devices.push(device);
     }
 
@@ -53,28 +52,47 @@ async function main(): Promise<any> {
             case 1:
                 return true;
             case 2:
+                return device.keypress(Client.keys.POWER);
+            case 3:
+                clear(true);
+                console.log('Getting applications...');
+                const applications = (await device.apps()).sort((a, b) => a.name.localeCompare(b.name));
+                const applicationNames: string[] = [];
+
+                for (const application of applications) {
+                    applicationNames.push(application.name);
+                }
+
+                clear(true);
+
+                applicationNames.unshift('Cancel');
+                console.log('Select an application to launch');
+                const selectedApplication = await select({ values: applicationNames }).catch(() => process.exit(0));
+                if (selectedApplication.id > 0) return device.launch(applications[selectedApplication.id as number - 1].id);
+                return;
+            case 4:
                 const text = rl.question('Input text: ');
                 if (text.length) await device.text(text);
                 return;
-            case 3:
-                return device.keypress(Client.keys.BACK);
-            case 4:
-                return device.keypress(Client.keys.HOME);
             case 5:
-                return device.keypress(Client.keys.UP);
+                return device.keypress(Client.keys.BACK);
             case 6:
-                return device.keypress(Client.keys.DOWN);
+                return device.keypress(Client.keys.HOME);
             case 7:
-                return device.keypress(Client.keys.SELECT);
+                return device.keypress(Client.keys.UP);
             case 8:
-                return device.keypress(Client.keys.LEFT);
+                return device.keypress(Client.keys.DOWN);
             case 9:
-                return device.keypress(Client.keys.RIGHT);
+                return device.keypress(Client.keys.SELECT);
             case 10:
-                return device.keypress(Client.keys.VOLUME_UP);
+                return device.keypress(Client.keys.LEFT);
             case 11:
-                return device.keypress(Client.keys.VOLUME_DOWN);
+                return device.keypress(Client.keys.RIGHT);
             case 12:
+                return device.keypress(Client.keys.VOLUME_UP);
+            case 13:
+                return device.keypress(Client.keys.VOLUME_DOWN);
+            case 14:
                 return device.keypress(Client.keys.VOLUME_MUTE);
         }
     }
@@ -86,6 +104,8 @@ async function main(): Promise<any> {
             values: [
                 'Exit',
                 'Devices',
+                'Power',
+                'Apps',
                 'Text',
                 'Back',
                 'Home',

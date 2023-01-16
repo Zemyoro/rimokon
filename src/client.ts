@@ -15,7 +15,6 @@ export interface Device extends Client {
     name: string;
     vendor: string;
     model: string;
-    applications: RokuApp[];
 }
 
 export { select, clear };

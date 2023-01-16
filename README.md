@@ -1,2 +1,2 @@
-# enkaku
+# rimokon
  Remote for Roku devices
